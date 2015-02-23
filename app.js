@@ -45,7 +45,7 @@ function Sequencer() {
     this.trigger = function (type, i) {
         this.output.send(type, {
             note: 36 + i,
-            velocity: 127,
+            velocity: 100,
             channel: 0
         });
     };
