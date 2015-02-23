@@ -1,0 +1,23 @@
+{
+  "name": "batman64",
+  "version": "0.0.1",
+  "description": "sequencer for bats with midi",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zzsnzmn/batman64.git"
+  },
+  "author": "zzsnzmn",
+  "license": "???",
+  "dependencies": {
+    "easymidi": "0.0.2",
+    "monome-grid": "0.0.5"
+  },
+  "bugs": {
+    "url": "https://github.com/zzsnzmn/batman64/issues"
+  },
+  "homepage": "https://github.com/zzsnzmn/batman64"
+}
