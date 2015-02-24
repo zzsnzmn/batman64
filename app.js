@@ -15,8 +15,10 @@ function Sequencer() {
     this.keys_held = 0;
     this.key_last = 0;
     this.dirty = true;
+}
 
-    this.reset = function () {
+Sequencer.prototype = {
+    reset: function() {
         this.dirty = true;
         this.ticks = 0;
         this.play_position = 0;
@@ -24,33 +26,29 @@ function Sequencer() {
         if (this.loop_start) {
             this.play_position = this.loop_start;
         }
-    };
-
-    this.row_on = function (position) {
+    },
+    row_on: function(position) {
         for (var y=0; y < 15; y++) {
             if(sequencer.steps[y][position] == 1) {
                 this.trigger('noteon', y);
             }
         }
-    };
-
-    this.row_off = function (position) {
+    },
+    row_off: function(position) {
         for (var y=0; y < 15; y++) {
             if(sequencer.steps[y][position] == 1) {
                 this.trigger('noteoff', y);
             }
         }
-    };
-
-    this.trigger = function (type, i) {
+    },
+    trigger: function(type, i) {
         this.output.send(type, {
             note: 36 + i,
             velocity: 100,
             channel: 0
         });
-    };
-
-    this.handle_press = function(x, y, s) {
+    },
+    handle_press: function(x, y, s) {
         if(s === 1 && y < 4) {
             this.steps[this.current_pad][this.press_to_index(x, y)] ^= 1;
             this.dirty = true;
@@ -63,26 +61,21 @@ function Sequencer() {
                 this.trigger('noteoff', this.get_4x4_press(y-4, x))
             }
         }
-    };
-
-    this.get_4x4_press = function (row, col) {
+    },
+    get_4x4_press: function(row, col) {
        return (row * 4) + col;
-    };
-    
-    this.draw_sequence = function(display, sequence) {
+    },
+    draw_sequence: function(display, sequence) {
         for (var i = 0; i < 32; i++) {
             var row = Math.floor(i/8);
             display[row][i%8] = sequence[i] * 15;
         }
-    };
-    
-    this.draw_play_position = function(display, position) {
+    },
+    draw_play_position: function(display, position) {
         var row = Math.floor(position/8);
         display[row][position%8] = 15;
-    }
-
-
-    this.draw_4x4 = function(display) {
+    },
+    draw_4x4: function(display) {
         var row = Math.floor(this.current_pad/4) + 4;
         display[row][this.current_pad%4] = 14;
 
@@ -92,9 +85,8 @@ function Sequencer() {
                 display[row][i%4] = 8
             }
         }
-    }
-
-    this.update_display = function() {
+    },
+    update_display: function() {
         var led = create2DArray(8, 8);
         var highlight = 0;
 
@@ -106,9 +98,8 @@ function Sequencer() {
         grid.refresh(led);
         this.dirty = false;
 
-    };
-
-    this.handle_pulse = function() {
+    },
+    handle_pulse: function() {
         this.ticks++;
         if (this.ticks % 6 != 0) {
             return;
@@ -132,9 +123,8 @@ function Sequencer() {
 
         this.cutting = false;
         this.dirty = true;
-    }
-
-    this.press_to_index = function (x, y) {
+    },
+    press_to_index: function(x, y) {
         return x + (y * 8)
     }
 
