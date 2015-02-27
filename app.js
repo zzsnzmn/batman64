@@ -6,6 +6,7 @@ function Sequencer() {
     this.output = new easymidi.Output('grid out', true);
     this.input = new easymidi.Input('grid in', true);
     this.steps = create2DArray(16, 32);
+    this.loops = 1;
     this.ticks = 0;
     this.play_position = 0;
     this.next_position = 0;
@@ -54,7 +55,7 @@ Sequencer.prototype = {
             this.dirty = true;
         } else if (y > 3 && x < 4) {
             if (s == 1) {
-                this.current_pad = this.get_4x4_press(y-4, x);
+                this.current_pad = this.get_4x4_press((y-4), x);
                 this.trigger('noteon', this.current_pad);
                 this.dirty = true;
             } else {
@@ -63,7 +64,17 @@ Sequencer.prototype = {
         }
     },
     get_4x4_press: function(row, col) {
-       return (row * 4) + col;
+       // row ^= 3;
+       return ((row^3) * 4) + col;
+    },
+    get_4x4_display_row: function(index) {
+        // Turn 0/1/2/3 -> 0, 4/5/6/7 -> 1, 8/9/10/11 -> 2, 12/13/14/15 -> 3
+        // switch 0 -> 3; 1 -> 2 ; 2 -> 1; 3 -> 0;
+        // then add 4 as an offset
+        return (Math.floor(index/4) ^ 3) + 4;
+    },
+    get_4x4_display_col: function(index) {
+        return index % 4
     },
     draw_sequence: function(display, sequence) {
         for (var i = 0; i < 32; i++) {
@@ -76,13 +87,17 @@ Sequencer.prototype = {
         display[row][position%8] = 15;
     },
     draw_4x4: function(display) {
-        var row = Math.floor(this.current_pad/4) + 4;
-        display[row][this.current_pad%4] = 14;
+        // var row = Math.floor(this.current_pad/4) + 4;
+
+        var row = this.get_4x4_display_row(this.current_pad);
+        var col = this.get_4x4_display_col(this.current_pad);
+        display[row][col] = 14;
 
         for (var i = 0; i < 16; i++) {
             if (this.steps[i][this.play_position] == 1) {
-                var row = Math.floor(i/4) + 4;
-                display[row][i%4] = 8
+                row = this.get_4x4_display_row(i);
+                col = this.get_4x4_display_col(i);
+                display[row][col] = 8
             }
         }
     },
@@ -158,7 +173,7 @@ function refresh() {
 setInterval(refresh, 1000/60);
 
 grid.key(function (x, y, s) {
-    sequencer.handle_press(x, y, s);
+        sequencer.handle_press(x, y, s);
 });
 
 function create2DArray(sizeY, sizeX) {
