@@ -13,10 +13,13 @@ npm install
 
 ### usage
 
-batman uses a virtual midi device and responds to midi clock. in order to use your DAW/midi sequencer will need to receive note messages from midi device named `grid in` and send clock messages to a device call `grid out`.
+batman uses a virtual midi device and responds to midi clock. in order to use your DAW/midi sequencer will need to receive note messages from midi device named `batman out` and send clock messages to a device called `batman in`.
 
-the bottom left quadrant is a 4x4 drum pad style midi trigger, the top 4 rows are used as a step editor. when you hit a pad on the bottom left it will show that pads step sequence on the top.
+![midi_setup](/midi_setup.png?raw=true "midi_setup")
 
-#### <todo>
+the top 4 rows are used as a step editor.
+the bottom left quadrant is a 4x4 drum pad style midi trigger.
+the bottom right quadrant selects the currently playing track.
 
-make the bottom right pads change current sequence
+hitting a pad on the bottom left will show the sequence for that given pad.
+

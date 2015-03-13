@@ -3,9 +3,9 @@ var easymidi = require('easymidi');
 
 function Sequencer() {
     this.current_pad = 0;
-    this.output = new easymidi.Output('grid out', true);
-    this.input = new easymidi.Input('grid in', true);
-    this.steps = create3DArray(8, 16, 32);
+    this.output = new easymidi.Output('batman out', true);
+    this.input = new easymidi.Input('batman in', true);
+    this.steps = create3DArray(16, 16, 32);
     this.current_loop = 0;
     this.ticks = 0;
     this.play_position = 0;
