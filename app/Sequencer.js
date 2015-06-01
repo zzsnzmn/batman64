@@ -1,11 +1,13 @@
-var grid = require('monome-grid')();
+var monomegrid = require('monome-grid');
 var easymidi = require('easymidi');
+
+var arr = require('./Array');
 
 function Sequencer() {
     this.current_pad = 0;
     this.output = new easymidi.Output('batman out', true);
     this.input = new easymidi.Input('batman in', true);
-    this.steps = create3DArray(16, 16, 32);
+    this.steps = arr.create3DArray(16, 16, 32);
     this.current_loop = 0;
     this.ticks = 0;
     this.play_position = 0;
@@ -16,9 +18,29 @@ function Sequencer() {
     this.keys_held = 0;
     this.key_last = 0;
     this.dirty = true;
+    this.grid = monomegrid();
 }
 
 Sequencer.prototype = {
+    initialize: function() {
+      var self = this;
+      self.input.on('start', function () {
+        self.reset();
+        self.row_on(self.play_position);
+      });
+
+      self.input.on('position', function (data) {
+          if(data.value != 0) {
+              return;
+          }
+          self.reset();
+      });
+
+      self.input.on('clock', function() {
+          self.handle_pulse();
+      });
+
+    },
     reset: function() {
         this.dirty = true;
         this.ticks = 0;
@@ -29,7 +51,7 @@ Sequencer.prototype = {
         }
     },
     row_on: function(position) {
-        for (var y=0; y < 15; y++) {
+        for (var y=0; y < 16; y++) {
             if(this.steps[this.current_loop][y][position] == 1) {
                 this.trigger('noteon', y);
             }
@@ -74,7 +96,7 @@ Sequencer.prototype = {
     get_4x4_display_row: function(index, offset) {
         // Turn 0/1/2/3 -> 0, 4/5/6/7 -> 1, 8/9/10/11 -> 2, 12/13/14/15 -> 3
         // switch 0 -> 3; 1 -> 2 ; 2 -> 1; 3 -> 0;
-        // then add 4 as an offset
+        // then add an offset
         return (Math.floor(index/4) ^ 3) + offset;
     },
     get_4x4_display_col: function(index, offset) {
@@ -113,16 +135,21 @@ Sequencer.prototype = {
         col = this.get_4x4_display_col(this.current_loop, x_offset);
         display[row][col] = 14;
     },
+    update: function() {
+      if (this.dirty) {
+          this.update_display();
+      }
+    },
     update_display: function() {
-        var led = create2DArray(8, 8);
+        var led = arr.create2DArray(8, 8);
         var highlight = 0;
-        
+
         this.draw_sequence(led, this.steps[this.current_loop][this.current_pad]);
         this.draw_play_position(led, this.play_position);
 
         this.draw_4x4(led);
 
-        grid.refresh(led);
+        this.grid.refresh(led);
         this.dirty = false;
 
     },
@@ -157,52 +184,4 @@ Sequencer.prototype = {
 
 };
 
-var sequencer = new Sequencer();
-
-sequencer.input.on('start', function () {
-    sequencer.reset();
-    sequencer.row_on(sequencer.play_position);
-});
-
-sequencer.input.on('position', function (data) {
-    if(data.value != 0)
-        return;
-    sequencer.reset();
-});
-
-sequencer.input.on('clock', function() {
-    sequencer.handle_pulse();
-});
-
-
-function refresh() {
-    if (sequencer.dirty) {
-        sequencer.update_display()
-    }
-}
-
-// call refresh 60 times per second
-setInterval(refresh, 1000/60);
-
-grid.key(function (x, y, s) {
-        sequencer.handle_press(x, y, s);
-});
-
-function create2DArray(sizeY, sizeX) {
-    var arr = [];
-    for (var y=0;y<sizeY;y++) {
-        arr[y] = [];
-        for (var x=0;x<sizeX;x++) {
-            arr[y][x] = 0;
-        }
-    }
-    return arr;
-}
-
-function create3DArray(sizeZ, sizeY, sizeX) {
-    var arr = [];
-    for (var z=0; z<sizeZ;z++) {
-        arr[z] = create2DArray(sizeY, sizeX);
-    }
-    return arr;
-}
+module.exports = Sequencer;
