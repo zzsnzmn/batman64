@@ -11,13 +11,13 @@ function get(name) {
   }
 }
 function set(name, data) {
-  fs.writeFileSync('./presets/'+name+'.json', JSON.stringify(data));
+  fs.writeFile('./presets/'+name+'.json', JSON.stringify(data));
 }
 
-set(1, create3DArray(16, 16, 32));
-set(2, create3DArray(16, 16, 32));
-set(3, create3DArray(16, 16, 32));
-set(4, create3DArray(16, 16, 32));
+// set(1, create3DArray(16, 16, 32));
+// set(2, create3DArray(16, 16, 32));
+// set(3, create3DArray(16, 16, 32));
+// set(4, create3DArray(16, 16, 32));
 
 function create2DArray(sizeY, sizeX) {
   var arr = [];

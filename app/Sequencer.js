@@ -1,13 +1,15 @@
 var monomegrid = require('monome-grid');
 var easymidi = require('easymidi');
 
+var preset = require('./Preset')
 var arr = require('./Array');
 
 function Sequencer() {
     this.current_pad = 0;
     this.output = new easymidi.Output('batman out', true);
     this.input = new easymidi.Input('batman in', true);
-    this.steps = arr.create3DArray(16, 16, 32);
+    // this.steps = arr.create3DArray(16, 16, 32);
+    this.steps = preset.get(1);
     this.current_loop = 0;
     this.ticks = 0;
     this.play_position = 0;
@@ -19,6 +21,7 @@ function Sequencer() {
     this.key_last = 0;
     this.dirty = true;
     this.grid = monomegrid();
+    this.preset = preset;
 }
 
 Sequencer.prototype = {
@@ -161,6 +164,8 @@ Sequencer.prototype = {
 
         if (this.play_position === 31) {
             this.play_position = 0;
+            // TODO: make this modified by button press.
+            this.preset.set('1', this.steps);
         } else {
             this.play_position++;
         }
